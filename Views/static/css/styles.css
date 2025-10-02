@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+#gantt_chart {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#timeline {
+    display: flex;
+    margin-top: 10px;
+}
+
+.gantt-block {
+    padding: 10px;
+    margin: 2px;
+    background-color: lightblue;
+    border: 1px solid #000;
+    min-width: 40px;
+    text-align: center;
+}
