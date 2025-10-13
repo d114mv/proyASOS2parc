@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SJF - Entrada de Datos</title>
+    <style>
+        body { font-family: Arial; background: #0d1117; color: #fff; text-align: center; }
+        h1 { color: #58a6ff; margin-top: 20px; }
+        table { margin: 20px auto; border-collapse: collapse; width: 400px; }
+        td, th { border: 1px solid #58a6ff; padding: 8px; }
+        input { padding: 5px; width: 60px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; background: #9b59b6; color: #fff; border: none; }
+        button:hover { background: #6f63d8; }
+    </style>
+</head>
+<body>
+    <h1>SJF - Ingrese los Procesos</h1>
+    <form id="formulario" method="POST">
+        Llegada: <input type="number" id="llegada" min="0" required>
+        CPU: <input type="number" id="cpu" min="1" required>
+        <button type="button" onclick="agregarProceso()">Agregar</button>
+        <br><br>
+        <table id="tabla">
+            <tr>
+                <th>N</th>
+                <th>Llegada</th>
+                <th>CPU</th>
+            </tr>
+        </table>
+        <input type="hidden" name="procesos" id="procesos_hidden">
+        <button type="submit" onclick="enviarProcesos()">Iniciar Simulación</button>
+    </form>
+
+    <script>
+        let procesos = [];
+
+        function agregarProceso() {
+            let llegada = document.getElementById("llegada").value;
+            let cpu = document.getElementById("cpu").value;
+            if(llegada === "" || cpu === "") { alert("Complete todos los campos"); return; }
+
+            procesos.push({llegada: llegada, cpu: cpu});
+            actualizarTabla();
+            document.getElementById("llegada").value = "";
+            document.getElementById("cpu").value = "";
+        }
+
+        function actualizarTabla() {
+            let tabla = document.getElementById("tabla");
+            tabla.innerHTML = "<tr><th>N</th><th>Llegada</th><th>CPU</th></tr>";
+            procesos.forEach((p, idx) => {
+                let row = tabla.insertRow();
+                row.insertCell(0).innerText = idx;
+                row.insertCell(1).innerText = p.llegada;
+                row.insertCell(2).innerText = p.cpu;
+            });
+        }
+
+        function enviarProcesos() {
+            document.getElementById("procesos_hidden").value = JSON.stringify(procesos);
+        }
+    </script>
+</body>
+</html>
