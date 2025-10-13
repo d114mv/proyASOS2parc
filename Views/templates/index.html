@@ -1,57 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Simulación de Algoritmos de Planificación</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planificación FCFS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
-<body>
-    <h1>Simulación de Planificación de CPU</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl">
+    <h1 class="text-2xl font-bold mb-6 text-center text-blue-700">Simulador FCFS</h1>
 
-    <div id="formulario">
-        <label>Algoritmo:</label>
-        <select id="algorithm">
-            <option value="FCFS">FCFS</option>
-            <option value="SJF">SJF</option>
-            <option value="SRT">SRT</option>
-            <option value="RR">Round Robin</option>
-            <option value="PRIORITY">Prioridades</option>
-        </select>
-        <br><br>
-        <label>Quantum (solo RR):</label>
-        <input type="number" id="quantum" min="1">
-        <br><br>
-        <label>Cambio de contexto:</label>
-        <input type="number" id="context_switch" min="0" value="0">
-        <br><br>
-        <button onclick="startSimulation()">Iniciar Simulación</button>
+    <form id="processForm" class="grid grid-cols-4 gap-4 mb-4">
+      <input id="pid" type="text" placeholder="PID" class="border rounded p-2 col-span-1" required>
+      <input id="arrival" type="number" placeholder="Llegada" class="border rounded p-2 col-span-1" required>
+      <input id="burst" type="number" placeholder="Ráfaga" class="border rounded p-2 col-span-1" required>
+      <input id="priority" type="number" placeholder="Prioridad" class="border rounded p-2 col-span-1">
+      <button type="submit" class="col-span-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Agregar Proceso</button>
+    </form>
+
+    <table class="w-full border-collapse border text-center mb-6">
+      <thead>
+        <tr class="bg-blue-200">
+          <th class="border p-2">PID</th>
+          <th class="border p-2">Llegada</th>
+          <th class="border p-2">Ráfaga</th>
+          <th class="border p-2">Prioridad</th>
+          <th class="border p-2">Acción</th>
+        </tr>
+      </thead>
+      <tbody id="processTable"></tbody>
+    </table>
+
+    <div class="flex justify-between">
+      <button id="clearBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Limpiar</button>
+      <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Iniciar Simulación</button>
     </div>
+  </div>
 
-    <div id="gantt_chart">
-        <h2>Diagrama de Gantt</h2>
-        <div id="timeline"></div>
-    </div>
-
-    <div id="queue_state">
-        <h2>Cola de Listos</h2>
-        <ul id="ready_queue"></ul>
-    </div>
-
-    <div id="results">
-        <h2>Resultados</h2>
-        <table border="1" id="result_table">
-            <thead>
-                <tr>
-                    <th>Proceso</th>
-                    <th>Tiempo de Espera</th>
-                    <th>Tiempo de Retorno</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
