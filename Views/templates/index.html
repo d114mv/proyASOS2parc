@@ -3,41 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Planificación FCFS</title>
+  <title>Simulador de Planificación de Procesos</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl">
-    <h1 class="text-2xl font-bold mb-6 text-center text-blue-700">Simulador FCFS</h1>
-
-    <form id="processForm" class="grid grid-cols-4 gap-4 mb-4">
-      <input id="pid" type="text" placeholder="PID" class="border rounded p-2 col-span-1" required>
-      <input id="arrival" type="number" placeholder="Llegada" class="border rounded p-2 col-span-1" required>
-      <input id="burst" type="number" placeholder="Ráfaga" class="border rounded p-2 col-span-1" required>
-      <input id="priority" type="number" placeholder="Prioridad" class="border rounded p-2 col-span-1">
-      <button type="submit" class="col-span-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Agregar Proceso</button>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+  <div class="bg-white shadow-xl rounded-2xl p-10 w-full max-w-lg text-center">
+    <h1 class="text-3xl font-bold text-blue-700 mb-8">Simulador de Planificación de Procesos</h1>
+    
+    <form method="POST" action="/algoritmo" class="grid gap-4">
+      <button name="algoritmo" value="FCFS" class="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">FCFS</button>
+      <button name="algoritmo" value="SJF" class="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold">SJF</button>
+      <button name="algoritmo" value="Prioridades" class="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-bold">Prioridades</button>
+      <button name="algoritmo" value="Round Robin" class="bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-lg font-bold">Round Robin</button>
     </form>
 
-    <table class="w-full border-collapse border text-center mb-6">
-      <thead>
-        <tr class="bg-blue-200">
-          <th class="border p-2">PID</th>
-          <th class="border p-2">Llegada</th>
-          <th class="border p-2">Ráfaga</th>
-          <th class="border p-2">Prioridad</th>
-          <th class="border p-2">Acción</th>
-        </tr>
-      </thead>
-      <tbody id="processTable"></tbody>
-    </table>
-
-    <div class="flex justify-between">
-      <button id="clearBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Limpiar</button>
-      <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Iniciar Simulación</button>
-    </div>
+    <p class="mt-6 text-gray-500 text-sm">ASOS II/2025</p>
   </div>
-
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
