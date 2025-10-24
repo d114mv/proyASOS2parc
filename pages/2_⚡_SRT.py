@@ -1,157 +1,148 @@
 import streamlit as st
 import pandas as pd
-from utils.srt import ejecutar_srt, crear_grafico_srt, calcular_metricas_srt
+from utils.srt import calcular_srt
+from utils.visualizacion import generar_visualizacion_srt
 
-st.set_page_config(
-    page_title="SRT - Simulador Planificación",
-    page_icon="⚡",
-    layout="wide"
+# --- Configuración de la Página ---
+st.set_page_config(layout="wide", page_title="Simulador SRT")
+st.title("⚡ Simulador de Planificación - SRT (Shortest Remaining Time)")
+st.caption("Algoritmo Preemptivo - Ejecuta el proceso con menor tiempo restante")
+
+# --- 1. Sección de Entrada de Datos ---
+st.header("1. Ingrese los Procesos")
+
+# Inicializar datos en session_state
+if 'procesos_srt' not in st.session_state:
+    st.session_state.procesos_srt = pd.DataFrame([
+        {"llegada": 0, "duracion": 5},
+        {"llegada": 1, "duracion": 3},
+        {"llegada": 2, "duracion": 8},
+        {"llegada": 3, "duracion": 2},
+    ])
+
+# Editor de datos para SRT
+edited_df = st.data_editor(
+    st.session_state.procesos_srt,
+    num_rows="dynamic",
+    column_config={
+        "llegada": st.column_config.NumberColumn("Tiempo de Llegada", min_value=0, required=True),
+        "duracion": st.column_config.NumberColumn("Duración (CPU)", min_value=1, required=True),
+    },
+    key="srt_data_editor"
 )
 
-st.title("⚡ Algoritmo SRT (Shortest Remaining Time)")
+# Guardar cambios
+st.session_state.procesos_srt = edited_df
 
-st.markdown("""
-El algoritmo **SRT (Shortest Remaining Time)** es una versión preemptiva de SJF que siempre 
-ejecuta el proceso con el **menor tiempo restante de ejecución**.
-""")
-
-# Sidebar para información
-with st.sidebar:
-    st.header("ℹ️ Acerca de SRT")
-    st.info("""
-    **Características:**
-    - ✅ Preemptivo
-    - ✅ Minimiza tiempo de respuesta
-    - ✅ Óptimo para tiempos cortos
-    - ❌ Inanición posible
-    - ❌ Complejo de implementar
-    """)
+# --- 2. Sección de Control de Simulación ---
+if st.button("▶ Iniciar Simulación SRT", type="primary"):
+    # Convertir DataFrame a lista de diccionarios
+    procesos_list = edited_df.to_dict('records')
     
+    if not procesos_list:
+        st.error("Por favor, agregue al menos un proceso.")
+    else:
+        # Calcular SRT
+        procesos_calculados = calcular_srt(procesos_list)
+        
+        # Guardar en session_state
+        st.session_state.procesos_calculados = procesos_calculados
+        st.session_state.tiempo_total = max(p['final'] for p in procesos_calculados)
+        st.session_state.tiempo_actual = 0
+        st.session_state.simulacion_iniciada = True
+        st.rerun()
+
+# --- 3. Sección de Visualización ---
+if st.session_state.get("simulacion_iniciada", False):
+    st.header("2. Visualización de la Simulación SRT")
+    
+    # Obtener datos actuales
+    tiempo_actual = st.session_state.tiempo_actual
+    tiempo_total = st.session_state.tiempo_total
+    
+    # Mostrar tiempo actual y controles
+    st.subheader(f"⏰ Tiempo Actual: {tiempo_actual}")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    if col1.button("⟲ Reiniciar"):
+        st.session_state.tiempo_actual = 0
+        st.rerun()
+
+    if col2.button("◀ Retroceder"):
+        if st.session_state.tiempo_actual > 0:
+            st.session_state.tiempo_actual -= 1
+            st.rerun()
+
+    if col3.button("Avanzar ▶"):
+        if st.session_state.tiempo_actual < tiempo_total:
+            st.session_state.tiempo_actual += 1
+            st.rerun()
+
+    if col4.button("▶▶ Ver Todo"):
+        st.session_state.tiempo_actual = tiempo_total
+        st.rerun()
+
+    # --- Generación del Gráfico SRT ---
+    fig = generar_visualizacion_srt(
+        st.session_state.procesos_calculados,
+        st.session_state.tiempo_actual
+    )
+    
+    # Mostrar gráfico
+    st.pyplot(fig)
+
+    # Mostrar datos calculados
+    with st.expander("📊 Ver datos calculados de los procesos"):
+        st.dataframe(st.session_state.procesos_calculados)
+
+# --- 4. Información Educativa ---
+with st.expander("📚 ¿Cómo funciona el Algoritmo SRT?"):
+    st.markdown("""
+    **⚡ SRT (Shortest Remaining Time) - Tiempo Restante Más Corto**
+
+    **Características Principales:**
+    - ✅ **Preemptivo**: Puede interrumpir procesos en ejecución
+    - 🎯 **Selección inteligente**: Siempre elige el proceso con menor tiempo restante
+    - ⏱️ **Excelente respuesta**: Minimiza tiempos de respuesta
+    - 🔄 **Reevaluación constante**: En cada llegada de proceso
+
+    **Cómo funciona paso a paso:**
+    1. **En cada unidad de tiempo**, verifica qué procesos han llegado
+    2. **Actualiza la cola** de procesos listos para ejecutar
+    3. **Selecciona el proceso** con menor tiempo restante de ejecución
+    4. **Si llega un proceso más corto**, puede interrumpir el actual
+    5. **Ejecuta por 1 unidad** y actualiza tiempos restantes
+    6. **Repite** hasta que todos los procesos terminen
+
+    **Ventajas:**
+    - Tiempos de respuesta muy cortos
+    - Eficiente para mezclas de procesos largos y cortos
+    - Más justo que FCFS para procesos cortos
+
+    **Desventajas:**
+    - ⚠️ Posibilidad de inanición para procesos largos
+    - ⚠️ Overhead por cambios de contexto frecuentes
+    - ⚠️ Requiere estimar tiempos de ejecución
+
+    **Ejemplo de aplicación:**
+    - Sistemas interactivos donde el tiempo de respuesta es crítico
+    - Entornos con mezcla de procesos cortos y largos
+    - Cuando se puede estimar razonablemente los tiempos de CPU
+    """)
+
+# Navegación en sidebar
+with st.sidebar:
+    st.header("🧭 Navegación")
     if st.button("🏠 Volver al Inicio"):
         st.switch_page("app.py")
-
-# Entrada de datos
-st.header("📥 Configuración de Procesos")
-
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    num_procesos = st.number_input(
-        "Número de procesos", 
-        min_value=1, 
-        max_value=8, 
-        value=4,
-        help="Selecciona cuántos procesos quieres simular"
-    )
-
-with col2:
-    st.markdown("### 💡 Tip")
-    st.caption("SRT funciona mejor con procesos de diferentes duraciones y tiempos de llegada escalonados")
-
-# Formulario dinámico para procesos
-st.subheader("✏️ Definir Procesos")
-
-procesos = []
-cols = st.columns(4)
-
-for i in range(num_procesos):
-    with cols[i % 4]:
-        st.markdown(f"**Proceso {i}**")
-        llegada = st.number_input(
-            f"Llegada P{i}", 
-            min_value=0, 
-            value=i,  # Llegadas escalonadas por defecto
-            key=f"llegada_{i}"
-        )
-        duracion = st.number_input(
-            f"Duración P{i}", 
-            min_value=1, 
-            value=(i+1)*2,  # Duraciones variadas por defecto
-            key=f"duracion_{i}"
-        )
-        
-        procesos.append({
-            'pid': i,
-            'llegada': llegada,
-            'duracion': duracion
-        })
-
-# Mostrar resumen de procesos
-if procesos:
-    st.subheader("📋 Resumen de Procesos")
-    df_procesos = pd.DataFrame(procesos)
-    df_procesos['Proceso'] = df_procesos['pid'].apply(lambda x: f'P{x}')
-    st.dataframe(df_procesos[['Proceso', 'llegada', 'duracion']], use_container_width=True)
-
-# Ejecutar simulación
-st.header("🎯 Simulación")
-
-if st.button("🚀 Ejecutar Simulación SRT", type="primary"):
-    if procesos:
-        with st.spinner("Ejecutando algoritmo SRT..."):
-            # Ejecutar algoritmo
-            resultado = ejecutar_srt(procesos)
-            
-            # Mostrar resultados
-            col1, col2, col3 = st.columns(3)
-            
-            metricas = calcular_metricas_srt(resultado)
-            
-            with col1:
-                st.metric(
-                    "⏱️ Tiempo de espera promedio", 
-                    f"{metricas['espera_promedio']:.2f}",
-                    delta=None
-                )
-            
-            with col2:
-                st.metric(
-                    "🔄 Tiempo de retorno promedio", 
-                    f"{metricas['retorno_promedio']:.2f}",
-                    delta=None
-                )
-            
-            with col3:
-                st.metric(
-                    "💻 Utilización de CPU", 
-                    f"{metricas['utilizacion_cpu']:.1f}%",
-                    delta=None
-                )
-            
-            # Mostrar gráfico
-            st.subheader("📊 Diagrama de Gantt y Resultados")
-            fig = crear_grafico_srt(resultado)
-            st.pyplot(fig)
-            
-            # Mostrar detalles de ejecución
-            st.subheader("🔍 Detalles de Ejecución")
-            for proc in resultado:
-                with st.expander(f"Proceso P{proc['pid']} - {len(proc['ejecuciones'])} segmentos"):
-                    st.write(f"**Llegada:** {proc['llegada']}")
-                    st.write(f"**Duración total:** {proc['duracion']}")
-                    st.write(f"**Tiempo de espera:** {proc['espera']}")
-                    st.write(f"**Tiempo de retorno:** {proc['retorno']}")
-                    st.write("**Segmentos de ejecución:**", proc['ejecuciones'])
-    else:
-        st.error("❌ Por favor ingresa al menos un proceso")
-
-# Información adicional
-with st.expander("📚 Explicación del Algoritmo SRT"):
-    st.markdown("""
-    **Cómo funciona SRT:**
     
-    1. **Preemptivo**: Puede interrumpir procesos en ejecución
-    2. **Selección**: Siempre elige el proceso con menor tiempo restante
-    3. **Respuesta**: Excelente para tiempos de respuesta cortos
-    4. **Cola de preparados**: Se reevalúa en cada interrupción/llegada
+    st.header("ℹ️ Acerca de SRT")
+    st.info("""
+    **SRT es óptimo para:**
+    - Minimizar tiempo de respuesta
+    - Procesos con diferentes duraciones
+    - Entornos donde llegan procesos en diferentes momentos
     
-    **Ventajas:**
-    - Minimiza el tiempo de respuesta promedio
-    - Eficiente para cargas de trabajo mixtas
-    - Mejor que SJF en términos de respuesta
-    
-    **Desventajas:**
-    - Posibilidad de inanición para procesos largos
-    - Overhead por cambios de contexto
-    - Complejidad de implementación
+    **Complejidad:** O(n log n) por reevaluación
     """)

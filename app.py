@@ -62,7 +62,7 @@ def main():
             - **Entrada interactiva** de procesos
             - **Visualización en tiempo real**
             - **Métricas de rendimiento**
-            - **Diagramas de Gantt**
+            - **Diagramas de Gantt interactivos**
             """)
     
     with col2:
