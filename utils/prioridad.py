@@ -1,9 +1,10 @@
-def calcular_sjf(procesos):
+def calcular_prioridad(procesos):
     """
-    Implementa el algoritmo Shortest Job First (no preemptivo)
+    Implementa planificación por prioridad (no preemptivo)
     """
-    # Asegurar llegadas
+    # Asegurar prioridades y llegadas
     for p in procesos:
+        p.setdefault('prioridad', 0)
         p.setdefault('llegada', 0)
     
     tiempo_actual = 0
@@ -15,8 +16,8 @@ def calcular_sjf(procesos):
         disponibles = [p for p in procesos_restantes if p['llegada'] <= tiempo_actual]
         
         if disponibles:
-            # Ordenar por duración más corta
-            disponibles.sort(key=lambda p: p['duracion'])
+            # Ordenar por prioridad (menor número = mayor prioridad)
+            disponibles.sort(key=lambda p: p['prioridad'])
             proceso_actual = disponibles[0]
             
             proceso_actual['inicio'] = tiempo_actual
