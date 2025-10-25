@@ -15,7 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inicializar session state
 if 'procesos_rr' not in st.session_state:
     st.session_state.procesos_rr = []
 if 'procesos_calculados_rr' not in st.session_state:
@@ -35,7 +34,6 @@ def main():
     proporcionando un balance entre rendimiento y equidad. Es ideal para sistemas interactivos.
     """)
     
-    # Sidebar con información
     with st.sidebar:
         st.header("ℹ️ Acerca de Round Robin")
         st.info("""
@@ -56,7 +54,6 @@ def main():
         if st.button("🏠 Volver al Inicio"):
             st.switch_page("app.py")
     
-    # Configuración de parámetros - SOLUCIÓN DEFINITIVA
     st.header("⚙️ Configuración de Round Robin")
     
     col1, col2, col3 = st.columns(3)
@@ -77,16 +74,13 @@ def main():
             value=st.session_state.config_rr['usar_cambio_contexto'],
             help="Simular el overhead del cambio entre procesos"
         )
-        # SOLUCIÓN: Si se activa el checkbox y el valor actual es 0, resetear a 1
         if usar_cc and st.session_state.config_rr['cambio_contexto'] == 0:
             st.session_state.config_rr['cambio_contexto'] = 1
         
         st.session_state.config_rr['usar_cambio_contexto'] = usar_cc
     
     with col3:
-        # SOLUCIÓN: Asegurar que siempre tengamos un valor válido
         if usar_cc:
-            # Si por alguna razón el valor es 0, corregirlo a 1
             current_value = st.session_state.config_rr['cambio_contexto']
             if current_value < 1:
                 current_value = 1
@@ -96,13 +90,12 @@ def main():
                 "Duración cambio contexto (ticks)",
                 min_value=1,
                 max_value=5,
-                value=current_value,  # Usar el valor corregido
+                value=current_value,  
                 help="Tiempo que toma cambiar entre procesos",
                 key="cc_input_active"
             )
             st.session_state.config_rr['cambio_contexto'] = cc_duracion
         else:
-            # Cuando está desactivado, mostrar placeholder
             st.text_input(
                 "Duración cambio contexto",
                 value="Desactivado",
@@ -110,9 +103,7 @@ def main():
                 help="Activa 'Usar cambio de contexto' para habilitar",
                 key="cc_placeholder_disabled"
             )
-            # No modificamos cambio_contexto cuando está desactivado para mantener el último valor válido
     
-    # Mostrar configuración actual
     st.info(f"""
     **Configuración actual:**
     - **Quantum:** {st.session_state.config_rr['quantum']} ticks
@@ -120,8 +111,6 @@ def main():
     - **Procesos en espera:** {len(st.session_state.procesos_rr) if st.session_state.procesos_rr else 0}
     """)
     
-    # Resto del código permanece igual...
-    # Entrada de datos
     st.header("📥 Configuración de Procesos")
     
     col1, col2 = st.columns([3, 1])
@@ -143,7 +132,6 @@ def main():
             st.session_state.simulacion_iniciada_rr = False
             st.rerun()
     
-    # Formulario para procesos
     st.subheader("✏️ Definir Procesos Round Robin")
     
     if not st.session_state.procesos_rr:
@@ -180,14 +168,12 @@ def main():
     
     st.session_state.procesos_rr = procesos_rr
     
-    # Mostrar resumen
     if st.session_state.procesos_rr:
         st.subheader("📋 Procesos Configurados")
         df_procesos = pd.DataFrame(st.session_state.procesos_rr)
         df_procesos['Proceso'] = df_procesos['pid'].apply(lambda x: f'P{x}')
         st.dataframe(df_procesos[['Proceso', 'llegada', 'duracion']], use_container_width=True)
     
-    # Ejecutar simulación
     st.header("🎯 Simulación Round Robin")
     
     col1, col2 = st.columns([1, 1])
@@ -197,7 +183,6 @@ def main():
             es_valido, mensaje = validar_procesos(st.session_state.procesos_rr)
             if es_valido:
                 with st.spinner("Ejecutando Round Robin..."):
-                    # Calcular RR con configuración
                     cambio_contexto = st.session_state.config_rr['cambio_contexto'] if st.session_state.config_rr['usar_cambio_contexto'] else 0
                     
                     procesos_calculados = calcular_rr(
@@ -219,14 +204,12 @@ def main():
             st.session_state.tiempo_actual_rr = 0
             st.rerun()
     
-    # Visualización de resultados
     if st.session_state.get("simulacion_iniciada_rr", False):
         st.header("📊 Resultados de la Simulación Round Robin")
         
         tiempo_actual = st.session_state.tiempo_actual_rr
         tiempo_total = calcular_tiempo_total(st.session_state.procesos_calculados_rr)
         
-        # Controles de simulación
         st.subheader(f"⏰ Tiempo Actual: {tiempo_actual} / {tiempo_total}")
         
         col1, col2, col3, col4 = st.columns(4)
@@ -253,13 +236,11 @@ def main():
                 st.session_state.tiempo_actual_rr = tiempo_total
                 st.rerun()
         
-        # Barra de progreso
         if tiempo_total > 0:
             st.progress(st.session_state.tiempo_actual_rr / tiempo_total)
         else:
             st.progress(0)
         
-        # Gráfico de Gantt
         fig = crear_grafico_gantt(
             st.session_state.procesos_calculados_rr,
             st.session_state.tiempo_actual_rr,
@@ -267,7 +248,6 @@ def main():
         )
         st.pyplot(fig)
         
-        # Métricas cuando termine la simulación
         if st.session_state.tiempo_actual_rr == tiempo_total:
             st.markdown("---")
             st.subheader("📈 Métricas Finales Round Robin")
@@ -284,17 +264,14 @@ def main():
             with col4:
                 st.metric("🔁 Quantum", st.session_state.config_rr['quantum'])
             
-            # Estadísticas de cambios de contexto
             if st.session_state.config_rr['usar_cambio_contexto']:
                 total_cambios = sum(len(p.get('ejecuciones', [])) - 1 for p in st.session_state.procesos_calculados_rr if len(p.get('ejecuciones', [])) > 1)
                 tiempo_cambios = total_cambios * st.session_state.config_rr['cambio_contexto']
                 st.info(f"**Cambios de contexto:** {total_cambios} cambios, {tiempo_cambios} ticks de overhead")
         
-        # Tabla detallada
         with st.expander("📋 Ver detalles de procesos calculados"):
             st.dataframe(pd.DataFrame(st.session_state.procesos_calculados_rr))
     
-    # Información educativa
     with st.expander("📚 Explicación Detallada del Algoritmo Round Robin"):
         st.markdown("""
         ## 🔄 Round Robin

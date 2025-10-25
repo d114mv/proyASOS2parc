@@ -2,11 +2,9 @@ def calcular_srt(procesos):
     """
     Implementa el algoritmo Shortest Remaining Time (preemptivo)
     """
-    # Asegurar que todos los procesos tengan llegada
     for p in procesos:
         p.setdefault('llegada', 0)
     
-    # Ordenar por tiempo de llegada primero
     procesos.sort(key=lambda p: p['llegada'])
     
     tiempo_actual = 0
@@ -16,16 +14,13 @@ def calcular_srt(procesos):
     total_procesos = len(procesos)
     
     while completados < total_procesos:
-        # Encontrar procesos que han llegado y no han terminado
         disponibles = [p for p in procesos if p['llegada'] <= tiempo_actual and restante[p['pid']] > 0]
         
         if disponibles:
-            # Ordenar por tiempo restante más corto (SRT)
             disponibles.sort(key=lambda p: restante[p['pid']])
             actual = disponibles[0]
             pid = actual['pid']
             
-            # Ejecutar 1 unidad de tiempo
             if not ejecuciones[pid] or ejecuciones[pid][-1][0] + ejecuciones[pid][-1][1] < tiempo_actual:
                 ejecuciones[pid].append((tiempo_actual, 1))
             else:
@@ -38,7 +33,6 @@ def calcular_srt(procesos):
                 completados += 1
                 actual['final'] = tiempo_actual
         else:
-            # Avanzar al siguiente tiempo de llegada
             procesos_pendientes = [p for p in procesos if p['llegada'] > tiempo_actual and restante[p['pid']] > 0]
             if procesos_pendientes:
                 siguiente_llegada = min(p['llegada'] for p in procesos_pendientes)
@@ -46,7 +40,6 @@ def calcular_srt(procesos):
             else:
                 tiempo_actual += 1
     
-    # Calcular métricas para cada proceso
     for p in procesos:
         p['ejecuciones'] = ejecuciones[p['pid']]
         if ejecuciones[p['pid']]:

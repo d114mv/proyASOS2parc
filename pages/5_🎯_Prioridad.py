@@ -15,7 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inicializar session state
 if 'procesos_pri' not in st.session_state:
     st.session_state.procesos_pri = []
 if 'procesos_calculados_pri' not in st.session_state:
@@ -33,7 +32,6 @@ def main():
     de prioridad asignados. Menor número = mayor prioridad (0 es la más alta).
     """)
     
-    # Sidebar con información
     with st.sidebar:
         st.header("ℹ️ Acerca de Prioridad")
         st.info("""
@@ -53,7 +51,6 @@ def main():
         if st.button("🏠 Volver al Inicio"):
             st.switch_page("app.py")
     
-    # Entrada de datos
     st.header("📥 Configuración de Procesos")
     
     col1, col2 = st.columns([3, 1])
@@ -75,7 +72,6 @@ def main():
             st.session_state.simulacion_iniciada_pri = False
             st.rerun()
     
-    # Formulario para procesos con prioridad
     st.subheader("✏️ Definir Procesos y Prioridades")
     
     st.info("💡 **Recordatorio:** Menor número = Mayor prioridad (0 es la más alta)")
@@ -124,7 +120,6 @@ def main():
     
     st.session_state.procesos_pri = procesos_pri
     
-    # Mostrar resumen ordenado por prioridad
     if st.session_state.procesos_pri:
         st.subheader("📋 Procesos (Ordenados por Prioridad)")
         procesos_ordenados = sorted(st.session_state.procesos_pri, key=lambda x: x['prioridad'])
@@ -137,7 +132,6 @@ def main():
         st.dataframe(df_pri[['Orden Ejecución', 'Proceso', 'Nivel Prioridad', 'prioridad', 'llegada', 'duracion']], 
                     use_container_width=True)
     
-    # Ejecutar simulación
     st.header("🎯 Simulación por Prioridad")
     
     col1, col2 = st.columns([1, 1])
@@ -162,14 +156,12 @@ def main():
             st.session_state.tiempo_actual_pri = 0
             st.rerun()
     
-    # Visualización de resultados
     if st.session_state.get("simulacion_iniciada_pri", False):
         st.header("📊 Resultados de la Simulación por Prioridad")
         
         tiempo_actual = st.session_state.tiempo_actual_pri
         tiempo_total = calcular_tiempo_total(st.session_state.procesos_calculados_pri)
         
-        # Controles de simulación
         st.subheader(f"⏰ Tiempo Actual: {tiempo_actual} / {tiempo_total}")
         
         col1, col2, col3, col4 = st.columns(4)
@@ -196,13 +188,11 @@ def main():
                 st.session_state.tiempo_actual_pri = tiempo_total
                 st.rerun()
         
-        # Barra de progreso
         if tiempo_total > 0:
             st.progress(st.session_state.tiempo_actual_pri / tiempo_total)
         else:
             st.progress(0)
         
-        # Gráfico de Gantt
         fig = crear_grafico_gantt(
             st.session_state.procesos_calculados_pri,
             st.session_state.tiempo_actual_pri,
@@ -210,7 +200,6 @@ def main():
         )
         st.pyplot(fig)
         
-        # Métricas cuando termine la simulación
         if st.session_state.tiempo_actual_pri == tiempo_total:
             st.markdown("---")
             st.subheader("📈 Métricas Finales por Prioridad")
@@ -225,7 +214,6 @@ def main():
             with col3:
                 st.metric("✅ Procesos Completados", metricas['procesos_completados'])
             
-            # Análisis por niveles de prioridad
             st.subheader("🎯 Análisis por Niveles de Prioridad")
             
             df_analisis = pd.DataFrame(st.session_state.procesos_calculados_pri)
@@ -242,16 +230,13 @@ def main():
             stats_prioridad.columns = ['Retorno Promedio', 'Espera Promedio', 'Cantidad Procesos']
             st.dataframe(stats_prioridad, use_container_width=True)
             
-            # Secuencia de ejecución
             st.subheader("🔄 Secuencia de Ejecución")
             secuencia = " → ".join([f"P{p['pid']}({p['prioridad']})" for p in st.session_state.procesos_calculados_pri])
             st.success(f"**Orden de ejecución:** {secuencia}")
         
-        # Tabla detallada
         with st.expander("📋 Ver detalles de procesos calculados"):
             st.dataframe(pd.DataFrame(st.session_state.procesos_calculados_pri))
     
-    # Información educativa
     with st.expander("📚 Explicación Detallada del Algoritmo de Prioridad"):
         st.markdown("""
         ## 🎯 Planificación por Prioridad

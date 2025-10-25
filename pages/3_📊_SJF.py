@@ -15,7 +15,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inicializar session state
 if 'procesos_sjf' not in st.session_state:
     st.session_state.procesos_sjf = []
 if 'procesos_calculados_sjf' not in st.session_state:
@@ -33,7 +32,6 @@ def main():
     minimizando el tiempo de espera promedio. Esta versión es **no preemptiva**.
     """)
     
-    # Sidebar para información
     with st.sidebar:
         st.header("ℹ️ Acerca de SJF")
         st.info("""
@@ -53,7 +51,6 @@ def main():
         if st.button("🏠 Volver al Inicio"):
             st.switch_page("app.py")
     
-    # Entrada de datos para SJF
     st.header("📥 Configuración de Procesos")
     
     st.info("💡 **Nota:** En SJF clásico, todos los procesos llegan al tiempo 0")
@@ -77,7 +74,6 @@ def main():
             st.session_state.simulacion_iniciada_sjf = False
             st.rerun()
     
-    # Formulario para duraciones
     st.subheader("✏️ Definir Duraciones de Procesos")
     
     if not st.session_state.procesos_sjf:
@@ -106,7 +102,6 @@ def main():
     
     st.session_state.procesos_sjf = procesos_sjf
     
-    # Mostrar resumen
     if st.session_state.procesos_sjf:
         st.subheader("📋 Procesos (Ordenados por Duración)")
         procesos_ordenados = sorted(st.session_state.procesos_sjf, key=lambda x: x['duracion'])
@@ -115,7 +110,6 @@ def main():
         df_sjf['Orden Ejecución'] = range(1, len(procesos_ordenados) + 1)
         st.dataframe(df_sjf[['Orden Ejecución', 'Proceso', 'duracion']], use_container_width=True)
     
-    # Ejecutar simulación SJF
     st.header("🎯 Simulación SJF")
     
     col1, col2 = st.columns([1, 1])
@@ -141,7 +135,6 @@ def main():
             st.session_state.tiempo_actual_sjf = 0
             st.rerun()
     
-    # Visualización interactiva
     if st.session_state.get("simulacion_iniciada_sjf", False):
         st.header("📊 Visualización de la Simulación SJF")
         
@@ -170,13 +163,11 @@ def main():
             st.session_state.tiempo_actual_sjf = tiempo_total
             st.rerun()
 
-        # Barra de progreso
         if tiempo_total > 0:
             st.progress(st.session_state.tiempo_actual_sjf / tiempo_total)
         else:
             st.progress(0)
 
-        # Generar visualización SJF
         fig = crear_grafico_gantt(
             st.session_state.procesos_calculados_sjf,
             st.session_state.tiempo_actual_sjf,
@@ -185,7 +176,6 @@ def main():
         
         st.pyplot(fig)
 
-        # Mostrar métricas cuando termine
         if st.session_state.tiempo_actual_sjf == tiempo_total:
             st.markdown("---")
             st.subheader("📈 Métricas Finales SJF")
@@ -200,16 +190,13 @@ def main():
             with col3:
                 st.metric("✅ Procesos Completados", metricas['procesos_completados'])
             
-            # Secuencia de ejecución
             st.subheader("🔄 Secuencia de Ejecución")
             secuencia = " → ".join([f"P{p['pid']}" for p in st.session_state.procesos_calculados_sjf])
             st.success(f"**Orden de ejecución:** {secuencia}")
 
-        # Mostrar datos calculados
         with st.expander("📋 Ver datos calculados de los procesos"):
             st.dataframe(pd.DataFrame(st.session_state.procesos_calculados_sjf))
 
-    # Información adicional
     with st.expander("📚 Explicación del Algoritmo SJF"):
         st.markdown("""
         ## 📊 Shortest Job First (SJF)

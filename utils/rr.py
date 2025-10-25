@@ -2,7 +2,6 @@ def calcular_rr(procesos, quantum=2, cambio_contexto=0):
     """
     Implementa el algoritmo Round Robin
     """
-    # Preparar procesos
     for p in procesos:
         p.setdefault('llegada', 0)
     
@@ -13,7 +12,6 @@ def calcular_rr(procesos, quantum=2, cambio_contexto=0):
     procesos_terminados = set()
     
     while len(procesos_terminados) < len(procesos):
-        # Agregar procesos que han llegado
         for p in procesos:
             pid = p['pid']
             if (pid not in procesos_terminados and 
@@ -26,17 +24,13 @@ def calcular_rr(procesos, quantum=2, cambio_contexto=0):
             proceso_actual = cola.pop(0)
             pid = proceso_actual['pid']
             
-            # Determinar tiempo a ejecutar
             tiempo_a_ejecutar = min(quantum, tiempo_restante[pid])
             
-            # Registrar ejecución
             ejecuciones[pid].append((tiempo_actual, tiempo_a_ejecutar))
             
-            # Actualizar tiempo restante
             tiempo_restante[pid] -= tiempo_a_ejecutar
             tiempo_actual += tiempo_a_ejecutar
             
-            # Verificar llegadas durante ejecución
             for p_nuevo in procesos:
                 pid_nuevo = p_nuevo['pid']
                 if (pid_nuevo not in procesos_terminados and 
@@ -52,14 +46,11 @@ def calcular_rr(procesos, quantum=2, cambio_contexto=0):
                 procesos_terminados.add(pid)
                 proceso_actual['final'] = tiempo_actual
             
-            # Aplicar cambio de contexto
             if cambio_contexto > 0:
                 tiempo_actual += cambio_contexto
         else:
-            # Avanzar tiempo si no hay procesos
             tiempo_actual += 1
     
-    # Calcular métricas finales
     for p in procesos:
         p['ejecuciones'] = ejecuciones[p['pid']]
         

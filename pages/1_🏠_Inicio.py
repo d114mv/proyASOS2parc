@@ -6,7 +6,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilos CSS CORREGIDOS
 st.markdown("""
 <style>
     .main-header {
@@ -74,10 +73,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def main():
-    # Header principal - CORREGIDO (sin transparencia)
     st.markdown('<div class="main-header">⚙️ Simulador de Planificación de Procesos</div>', unsafe_allow_html=True)
     
-    # Introducción
     st.markdown("""
     <div style='text-align: center; font-size: 1.2rem; color: #555; margin-bottom: 3rem;'>
         Plataforma educativa para simular y comprender algoritmos de planificación 
@@ -85,7 +82,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Información del equipo - CORREGIDO
     st.markdown("### 👥 Equipo de Desarrollo")
     st.markdown("""
     <div class="team-card">
@@ -112,7 +108,6 @@ def main():
     
     st.markdown("---")
     
-    # Algoritmos disponibles - CORREGIDO
     st.markdown("### 🎯 Algoritmos Disponibles")
     
     col1, col2 = st.columns(2)
@@ -132,7 +127,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # SJF
         st.markdown("""
         <div class="algo-card">
             <h3>📊 SJF</h3>
@@ -146,7 +140,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # SRT
         st.markdown("""
         <div class="algo-card">
             <h3>⚡ SRT</h3>
@@ -161,7 +154,6 @@ def main():
         """, unsafe_allow_html=True)
     
     with col2:
-        # Round Robin
         st.markdown("""
         <div class="algo-card">
             <h3>🔄 Round Robin</h3>
@@ -175,7 +167,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
         
-        # Prioridad
         st.markdown("""
         <div class="algo-card">
             <h3>🎯 Prioridad</h3>
@@ -189,7 +180,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Cómo usar - CORREGIDO
     st.markdown("---")
     st.markdown("### 📖 Cómo Usar el Simulador")
     
@@ -222,7 +212,6 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Métricas explicadas
     with st.expander("📊 Métricas que Calculamos"):
         st.markdown("""
         **⏱️ Tiempo de Retorno (Turnaround Time):**
@@ -241,7 +230,6 @@ def main():
         - Tiempo desde la llegada hasta la primera ejecución (solo algoritmos preemptivos)
         """)
     
-    # Footer
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 2rem;">
