@@ -198,7 +198,7 @@ def main():
         # Información adicional
         with st.expander("ℹ️ Acerca del Proyecto"):
             st.markdown("""
-            **Proyecto Académico - Administración de Sistemas Operativos y Servidores**
+            **Proyecto Académico - Administración de Sistemas Operativos y Servidores - Escuela Militar de Ingeniería U.A. Cochabamba**
             
             Este simulador permite estudiar y comparar diferentes 
             algoritmos de planificación de procesos utilizados 

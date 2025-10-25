@@ -245,7 +245,7 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 2rem;">
-        <p><strong>Proyecto Académico - Administración de Sistemas Operativos y Servidores</strong></p>
+        <p><strong>Proyecto Académico - Administración de Sistemas Operativos y Servidores - Escuela Militar de Ingeniería U.A. Cochabamba</strong></p>
         <p>Simulador desarrollado para fines educativos y de investigación</p>
         <p>© 2025 - CodeStorm - Todos los derechos reservados.</p>
     </div>
